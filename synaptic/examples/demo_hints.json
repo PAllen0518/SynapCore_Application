@@ -1,0 +1,11 @@
+{
+  "wallet_label": "btcrecover-public-test",
+  "wallet_type": "multibit-classic",
+  "delimiters": ["-"],
+  "notes": "Hints for btcrecover's PUBLIC test wallet (multibit-wallet.key). Its password is documented publicly as 'btcr-test-password' and it holds no funds, so this file is safe to commit. A REAL hint set is personal candidate material and belongs in a gitignored *hints*.json, never in version control.",
+  "hints": [
+    {"text": "btcr",     "kind": "word", "weight": 3, "position": 1},
+    {"text": "test",     "kind": "word", "weight": 3, "position": 2},
+    {"text": "password", "kind": "word", "weight": 3, "position": 3}
+  ]
+}
