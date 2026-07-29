@@ -55,20 +55,19 @@ def load_wallet(wallet_path: str):
 
 
 def write_found_password(password: str, cwd: str | None = None) -> str:
-    """Write a recovered password via the checker's restricted-file routine.
+    """Write a recovered password to a restricted (0600) file and return its path.
 
-    Returns the path written. synaptic calls this only at the moment of a hit and
-    never keeps the plaintext itself.
+    Mirrors the checker's own routine (owner-only file, never stdout) but writes
+    directly to the target directory instead of mutating the process CWD, so it
+    is safe to call re-entrantly. synaptic calls this only at the moment of a hit
+    and never keeps the plaintext itself.
     """
-    mc = _import_checker()
-    prev = os.getcwd()
-    if cwd:
-        os.chdir(cwd)
-    try:
-        mc.write_found_password(password)
-        return os.path.abspath("RECOVERED_PASSWORD.txt")
-    finally:
-        os.chdir(prev)
+    directory = cwd or os.getcwd()
+    path = os.path.join(directory, "RECOVERED_PASSWORD.txt")
+    fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(password)
+    return os.path.abspath(path)
 
 
 class RunResult:
