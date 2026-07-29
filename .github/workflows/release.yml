@@ -1,0 +1,32 @@
+name: Release synaptic
+
+# On a version tag, build the synaptic sdist + wheel and attach them to a
+# GitHub Release. Versioning is manual (bump pyproject + CHANGELOG, then tag).
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade build
+          python -m build synaptic/ --outdir dist/
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

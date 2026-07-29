@@ -1,0 +1,30 @@
+name: CodeQL
+
+# Static security analysis for the Python code, as a second automated review
+# perspective beyond lint + tests.
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  schedule:
+    - cron: "0 6 * * 1" # weekly, Monday 06:00 UTC
+
+jobs:
+  analyze:
+    name: Analyze (python)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
