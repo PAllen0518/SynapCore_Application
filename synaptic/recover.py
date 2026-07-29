@@ -168,7 +168,7 @@ def recover(
         coverage.record(
             client, wallet_id, run_id, scored[:checked], delimiters=hint_set.delimiters, tried=True
         )
-    except Exception as exc:  # finalize the run row, then re-raise
+    except Exception as exc:  # noqa: BLE001 - finalize the run row, then re-raise
         notes = f"error: {type(exc).__name__}: {exc}"[:300]
         raise
     finally:

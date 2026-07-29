@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synaptic"
+version = "0.1.0"
+description = "A SynapCores-backed intelligence and memory layer for BitCracker V2"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-2.0-only" }
+authors = [{ name = "Paul Allen" }]
+# The package itself is standard-library only at runtime; pycryptodome is needed
+# because synaptic reuses BitCracker's multibit_check for candidate enumeration
+# and in-process checking. Pinned for reproducibility.
+dependencies = [
+    "pycryptodome==3.23.0",
+]
+
+[project.optional-dependencies]
+yaml = ["pyyaml==6.0.2"]
+dev = [
+    "pytest==8.3.4",
+    "pytest-cov==6.0.0",
+    "ruff==0.16.0",
+]
+
+[project.scripts]
+synaptic = "synaptic.cli:main"
+
+[tool.setuptools]
+# Flat layout: this pyproject lives inside the package dir, so map the
+# "synaptic" import package to the current directory.
+packages = ["synaptic", "synaptic.vendor"]
+package-dir = { "synaptic" = "." }
+
+[tool.setuptools.package-data]
+# Ship the vendored checker + public test wallet with the package.
+"synaptic.vendor" = ["multibit_check.py", "test-wallets/*.key"]
+
+# --- lint -----------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+# Vendored third-party code is not linted/formatted to this project's rules.
+extend-exclude = ["vendor"]
+
+[tool.ruff.lint]
+# Broadened from the default E/F: import sorting (I), bugbear (B), pyupgrade
+# (UP), simplify (SIM), comprehensions (C4), and implicit-str-concat (ISC).
+select = ["E", "F", "I", "B", "UP", "SIM", "C4", "ISC"]
+
+# --- tests ----------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["synaptic"]
+# The tests themselves, the live-only demo, trivial entrypoints, and the
+# vendored third-party checker don't count toward the package's covered-code metric.
+omit = ["*/tests/*", "*/demo.py", "*/__main__.py", "*/vendor/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if __name__ == .__main__.:", "raise SystemExit"]

@@ -1,10 +1,16 @@
-# synaptic runtime + test dependencies.
+# Pinned dependency set for synaptic. pyproject.toml is the canonical manifest;
+# this file mirrors it (exact pins) for the plain `pip install -r` path.
 #
-# The package itself uses only the Python standard library to talk to SynapCores.
-# pycryptodome is needed because synaptic reuses BitCracker's multibit_check for
-# candidate enumeration and in-process checking. pytest/ruff are for CI.
-pycryptodome>=3.20
-pytest>=8.0
-ruff>=0.6.0
-# Optional: PyYAML lets hint sets be written as .yml instead of .json.
-# pyyaml>=6.0
+# Preferred install:  pip install -e "synaptic[dev]"
+# Plain install:      pip install -r synaptic/requirements.txt
+
+# runtime
+pycryptodome==3.23.0
+
+# dev / CI
+pytest==8.3.4
+pytest-cov==6.0.0
+ruff==0.16.0
+
+# optional: YAML hint files
+# pyyaml==6.0.2

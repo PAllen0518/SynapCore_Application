@@ -1,7 +1,8 @@
 name: CI
 
-# Lint and test the synaptic package. The unit tests are DB-free (the live
-# SynapCores path is opt-in via SYNAPTIC_LIVE), so no database is needed here.
+# Lint, format-check, and test the synaptic package. The unit tests are DB-free
+# (the live SynapCores path is opt-in via SYNAPTIC_LIVE), so no database or
+# container is needed here.
 on:
   push:
     branches: [main, master]
@@ -23,11 +24,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: pip install -r synaptic/requirements.txt
+      - name: Install (pinned, from pyproject)
+        run: pip install -e "synaptic[dev]"
 
       - name: Lint (ruff)
-        run: ruff check --config synaptic/ruff.toml synaptic/
+        run: ruff check --config synaptic/pyproject.toml synaptic/
 
-      - name: Test (pytest)
-        run: python -m pytest synaptic/tests/ -v
+      - name: Format check (ruff)
+        run: ruff format --check --config synaptic/pyproject.toml synaptic/
+
+      - name: Test (pytest + coverage)
+        run: >-
+          python -m pytest synaptic/tests/ -v
+          --cov=synaptic --cov-config=synaptic/pyproject.toml
+          --cov-report=term-missing --cov-fail-under=80
