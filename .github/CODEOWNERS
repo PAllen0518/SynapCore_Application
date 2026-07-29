@@ -1,0 +1,4 @@
+# Code owners route review requests automatically when PRs are opened.
+# The synaptic subsystem and its CI are owned by the maintainer.
+/synaptic/                     @PAllen0518
+/.github/workflows/            @PAllen0518
