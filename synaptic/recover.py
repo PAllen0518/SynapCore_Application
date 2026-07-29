@@ -59,6 +59,15 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def wallet_id_by_label(client: SynapCoresClient, label: str) -> str | None:
+    """Resolve a wallet label to its id, quoting the label via ``sql_literal``.
+
+    Centralized so every label lookup uses the same safe quoting instead of ad
+    hoc f-string interpolation.
+    """
+    return client.sql_scalar(f"SELECT id FROM sc_wallets WHERE label = {sql_literal(label)}")
+
+
 def _register_wallet(
     client: SynapCoresClient, wallet_id: str, label: str, wallet_type: str, salt_hex: str
 ) -> None:
@@ -218,9 +227,7 @@ def recent_runs(
     """Return recent runs (most recent first) as dicts, for recall/reporting."""
     where = ""
     if wallet_label:
-        wid = client.sql_scalar(
-            f"SELECT id FROM sc_wallets WHERE label = {sql_literal(wallet_label)}"
-        )
+        wid = wallet_id_by_label(client, wallet_label)
         if wid:
             where = f"WHERE wallet_id = {sql_literal(wid)}"
     rows = client.sql(

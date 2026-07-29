@@ -25,7 +25,7 @@ from .client import SynapCoresClient, SynapCoresError
 from .config import Settings
 from .generate import write_tokenlist
 from .hints import build_graph, load_hints, read_hints_from_graph
-from .recover import recent_runs, recover
+from .recover import recent_runs, recover, wallet_id_by_label
 
 
 def _client() -> SynapCoresClient:
@@ -43,9 +43,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     print(f"SynapCores at {client.settings.url}: {health.get('status')}")
     schema.bootstrap(client)
     if args.wallet_label:
-        wid = client.sql_scalar(
-            f"SELECT id FROM sc_wallets WHERE label = '{args.wallet_label}'"
-        )
+        wid = wallet_id_by_label(client, args.wallet_label)
         if wid:
             print(f"wallet '{args.wallet_label}' ({wid}):", coverage.coverage_report(client, wid))
         else:
@@ -128,7 +126,7 @@ def _print_report(report) -> None:
 def cmd_forget(args: argparse.Namespace) -> int:
     client = _client()
     schema.bootstrap(client)
-    wid = client.sql_scalar(f"SELECT id FROM sc_wallets WHERE label = '{args.wallet_label}'")
+    wid = wallet_id_by_label(client, args.wallet_label)
     if not wid:
         print(f"no wallet registered with label '{args.wallet_label}'")
         return 1

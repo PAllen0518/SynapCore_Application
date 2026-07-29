@@ -36,7 +36,7 @@ from .client import SynapCoresClient, SynapCoresError
 from .config import Settings
 from .generate import generate_tokenlist
 from .hints import build_graph, load_hints, read_hints_from_graph
-from .recover import recent_runs, recover
+from .recover import recent_runs, recover, wallet_id_by_label
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_INFO = {"name": "synaptic", "version": "0.1.0"}
@@ -132,7 +132,7 @@ def _tool_status(args: dict) -> str:
     out = {"url": client.settings.url, "health": health.get("status")}
     label = args.get("wallet_label")
     if label:
-        wid = client.sql_scalar(f"SELECT id FROM sc_wallets WHERE label = '{label}'")
+        wid = wallet_id_by_label(client, label)
         out["wallet"] = coverage.coverage_report(client, wid) if wid else "not registered"
     else:
         out["wallets"] = client.sql_scalar("SELECT COUNT(*) FROM sc_wallets") or 0
@@ -186,7 +186,7 @@ def _tool_run_recovery(args: dict) -> str:
 def _tool_coverage(args: dict) -> str:
     client = _client()
     schema.bootstrap(client)
-    wid = client.sql_scalar(f"SELECT id FROM sc_wallets WHERE label = '{args['wallet_label']}'")
+    wid = wallet_id_by_label(client, args["wallet_label"])
     if not wid:
         return json.dumps({"error": "wallet label not registered"})
     return json.dumps(coverage.coverage_report(client, wid), indent=2)
