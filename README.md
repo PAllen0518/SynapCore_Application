@@ -1,4 +1,4 @@
-# SynapCores application — `synaptic`
+# SynapCores application - `synaptic`
 
 Application deliverable for SynapCores' **Founding GTM Engineer / Solutions
 Architect** role: build something with SynapCores CE and show it.
@@ -8,7 +8,7 @@ top of a MultiBit wallet password-recovery checker. A knowledge graph of the
 owner's memory hints generates candidate tokenlists (GraphRAG), in-database
 AutoML ranks candidates by likelihood, a SQL/vector ledger stops re-sweeping
 keyspace already tried, and the whole loop is exposed over MCP. It exercises
-every SynapCores surface — SQL, vector, graph, AutoML, embedded LLM, MCP — and
+every SynapCores surface - SQL, vector, graph, AutoML, embedded LLM, MCP - and
 runs end-to-end against a public, zero-funds test wallet.
 
 Full documentation, architecture, and quickstart: **[synaptic/README.md](synaptic/README.md)**.

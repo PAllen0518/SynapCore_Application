@@ -1,13 +1,11 @@
 """Numeric shape features for a candidate password.
 
-Two consumers:
+Two consumers: AutoML (whose feature engineering only takes numeric columns, so
+every feature here is an int) and the heuristic ranker (a cheap structural prior
+over the same numbers).
 
-* AutoML - SynapCores' feature engineering only accepts numeric columns, so
-  every feature here is an ``int``.
-* the heuristic ranker - a cheap structural prior computed from the same numbers.
-
-Nothing here inspects secrets beyond the candidate's own shape, and features are
-what get stored (never the plaintext) so coverage/ranking can persist safely.
+Features are what we store instead of the plaintext, so coverage and ranking can
+persist without ever keeping a candidate password.
 """
 
 from __future__ import annotations
@@ -53,6 +51,6 @@ def extract(candidate: str, delimiters: Sequence[str] = ("",)) -> dict[str, int]
 
 
 def vector(candidate: str, delimiters: Sequence[str] = ("",)) -> list[int]:
-    """Feature values in ``FEATURE_COLUMNS`` order."""
+    """Feature values in FEATURE_COLUMNS order."""
     feats = extract(candidate, delimiters)
     return [feats[col] for col in FEATURE_COLUMNS]

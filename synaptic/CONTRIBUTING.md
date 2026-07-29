@@ -4,13 +4,13 @@ Small subsystem, simple rules.
 
 ## Workflow
 
-1. Branch off `master` (`feature/…` or `fix/…`) — never commit directly to `master`.
-2. Open a PR using the template. CI (lint + format + tests, Python 3.10–3.12) must pass.
+1. Branch off `master` (`feature/...` or `fix/...`) - never commit directly to `master`.
+2. Open a PR using the template. CI (lint + format + tests, Python 3.10-3.12) must pass.
 3. Keep PRs scoped to one concern; separate style from behavior.
 
-**Branch protection (maintainer setup):** enable on `master` — require the CI
+**Branch protection (maintainer setup):** enable on `master` - require the CI
 status check to pass and require a PR before merge. This is a GitHub repo
-setting (Settings → Branches), not something the repo can enforce by itself.
+setting (Settings -> Branches), not something the repo can enforce by itself.
 
 ## Local checks
 

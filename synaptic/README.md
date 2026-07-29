@@ -1,12 +1,12 @@
-# synaptic — a SynapCores-backed intelligence layer for BitCracker V2
+# synaptic - a SynapCores-backed intelligence layer for BitCracker V2
 
-BitCracker V2 is fast at *checking* MultiBit Classic wallet passwords — a custom
+BitCracker V2 is fast at *checking* MultiBit Classic wallet passwords - a custom
 CUDA kernel does ~11M candidates/sec. But raw speed is rarely what stands between
 someone and their own forgotten wallet. The bottleneck is **judgement**: which
 candidates are worth trying, and which keyspace you already swept last month.
 
 `synaptic` puts that judgement layer in
-[SynapCores Community Edition](https://synapcores.com) — an AI-native database
+[SynapCores Community Edition](https://synapcores.com) - an AI-native database
 that unifies SQL, vector search, a property graph, in-database AutoML, and an
 embedded LLM behind one REST gateway. BitCracker stays the *muscle*; SynapCores
 becomes the *brain*.
@@ -19,16 +19,15 @@ becomes the *brain*.
 
 > **Self-contained.** This repo vendors the small MultiBit checker
 > (`multibit_check.py`) and the public test wallet under `synaptic/vendor/`, so it
-> installs, tests, and demos on its own — no BitCracker V2 checkout required. The
+> installs, tests, and demos on its own - no BitCracker V2 checkout required. The
 > checker is a point-in-time copy of the file from the BitCracker V2 project
-> (© 2026 Paul Allen, GPLv2).
+> ((c) 2026 Paul Allen, GPLv2).
 
 ---
 
 ## Why this is a good fit for SynapCores
 
-The recovery loop happens to exercise *every* surface SynapCores offers, on a
-real problem rather than a toy:
+The recovery loop uses every SynapCores surface, on a real problem:
 
 | Surface | What synaptic uses it for |
 |---|---|
@@ -37,7 +36,7 @@ real problem rather than a toy:
 | **In-database AutoML** | Trains a "password-like vs. random" classifier that ranks candidates so the search tries plausible ones first. |
 | **Vector search** | Embeds candidates to flag near-duplicate variants across historical searches. |
 | **SQL** | A run ledger + candidate coverage table, so a keyspace is never swept twice. |
-| **MCP** | The whole loop is exposed as MCP tools, so an agent (Claude, Cursor, …) can drive a recovery campaign conversationally. |
+| **MCP** | The whole loop is exposed as MCP tools, so an agent (Claude, Cursor, ...) can drive a recovery campaign conversationally. |
 
 ---
 
@@ -51,7 +50,7 @@ flowchart LR
     end
 
     subgraph SynapCores["SynapCores CE (one binary)"]
-      G[(property graph<br/>Wallet→Hint)]
+      G[(property graph<br/>Wallet->Hint)]
       L[embedded LLM<br/>entity extraction]
       A[AutoML<br/>password-likeness]
       V[(vector store<br/>candidate embeddings)]
@@ -122,7 +121,7 @@ can take the same search at full speed.
 ### Container lifecycle & footprint (runbook)
 
 The CE container is **CPU-bound** (it runs an embedded ~7B LLM on CPU) and uses
-**several GB of RAM** — stop it when idle.
+**several GB of RAM** - stop it when idle.
 
 | Action | Command |
 |---|---|
@@ -190,7 +189,7 @@ python -m synaptic runs --wallet-label btcrecover-public-test
 python -m synaptic status --wallet-label btcrecover-public-test
 ```
 
-The recovered password is **never** printed or stored — on success the checker's
+The recovered password is **never** printed or stored - on success the checker's
 restricted `RECOVERED_PASSWORD.txt` (owner read/write only) is written and its
 path is reported.
 
@@ -216,7 +215,7 @@ password material** and is treated as sensitive: `*hints*.json` is gitignored
 }
 ```
 
-* `weight ≥ 3` → a **required** tokenlist line; below that → **optional** (gets an
+* `weight >= 3` -> a **required** tokenlist line; below that -> **optional** (gets an
   empty "skip" alternative so a fragment can be absent).
 * `position` (1-indexed) anchors a fragment to a slot; unpositioned hints are
   ordered by weight.
@@ -235,16 +234,16 @@ tokenizer otherwise.
 
 Two interchangeable backends (`--ranker heuristic|automl`):
 
-* **heuristic** — a structural prior over candidate shape (length, character
+* **heuristic** - a structural prior over candidate shape (length, character
   classes, multi-word structure), optionally blended with embedding similarity
   to "style seeds" (example passwords you've used elsewhere). No training, no GPU.
-* **automl** — trains an in-database SynapCores classifier to separate
+* **automl** - trains an in-database SynapCores classifier to separate
   realistically-shaped passwords from random strings on synthetic examples, then
   scores each candidate by the model's predicted probability. The model's
   accuracy is surfaced in the run report.
 
 Ranking only *reorders* work; it never drops a candidate, so a good password is
-never lost to a bad score — just checked later.
+never lost to a bad score - just checked later.
 
 ---
 
@@ -305,7 +304,7 @@ SYNAPTIC_LIVE=1 SYNAPCORES_URL=... SYNAPCORES_PASSWORD=... \
 Built against a live CE instance; a few surface details differed from the OpenAPI
 document and are worth flagging (the client encapsulates all of them):
 
-* `/v1/query/execute` **rejects `$1` bound parameters** — values must be inlined.
+* `/v1/query/execute` **rejects `$1` bound parameters** - values must be inlined.
   synaptic centralizes safe SQL literal quoting in `client.sql_literal` and only
   ever quotes values it generated itself.
 * Vector payloads carry the embedding under **`values`**, and search under
@@ -313,7 +312,7 @@ document and are worth flagging (the client encapsulates all of them):
 * Graph edges use **`src`/`dst`/`type`**; the graph is the tenant's single
   implicit graph (a `graph` name is rejected). `/v1/graph/match` takes its Cypher
   under the **`sql`** field.
-* AutoML: `dataset_type` is the task family (`classification`, …); `train` needs
+* AutoML: `dataset_type` is the task family (`classification`, ...); `train` needs
   `target` + `collection`; **feature and target columns must be numeric**;
   `predict` takes **`inputs: [ {col: val} ]`** and returns `{predictions: [...] }`.
 * **`DELETE` hides rows from queries but does not release keys from a PRIMARY KEY
@@ -324,5 +323,5 @@ document and are worth flagging (the client encapsulates all of them):
   (`sc_candidates.tried`) and some aggregate functions are unavailable in the
   conflict/"sync" context.
 
-None of these are blockers — they're the kind of rough edges a design partner
+None of these are blockers - they're the kind of rough edges a design partner
 would surface in week one.

@@ -1,13 +1,12 @@
-"""Idempotent bootstrap of the SynapCores objects ``synaptic`` relies on.
+"""Idempotent bootstrap of the SynapCores objects synaptic needs.
 
-Three SQL tables and one vector collection make up the persistent "recovery
-memory". The graph uses the tenant's implicit graph, so it needs no DDL.
+Three SQL tables and one vector collection hold the persistent "recovery memory".
+The graph uses the tenant's implicit graph, so it needs no DDL.
 
-Deliberately, the recovered password is *never* stored. The candidate table
-keeps only a salted SHA-256 (for exact "already tried" checks) plus numeric
-shape features; the vector collection keeps only embeddings. The plaintext
-candidate list lives solely in the generated tokenlist file, which ``.gitignore``
-already excludes.
+The recovered password is never stored. The candidate table keeps only a salted
+SHA-256 (for exact "already tried" checks) plus numeric shape features; the
+vector collection keeps only embeddings. The plaintext candidates live only in
+the generated tokenlist file, which .gitignore excludes.
 """
 
 from __future__ import annotations

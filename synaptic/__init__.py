@@ -1,26 +1,26 @@
-"""synaptic - a SynapCores-backed intelligence and memory layer for BitCracker V2.
+"""synaptic: a SynapCores-backed intelligence and memory layer for BitCracker V2.
 
-BitCracker V2 is fast at *checking* passwords (a CUDA kernel does ~11M/s). The
-hard part of a real personal recovery is not raw speed - it is deciding *which*
-candidates are worth checking and not re-checking a keyspace you already swept.
+BitCracker V2 is fast at checking passwords (a CUDA kernel does ~11M/s). But on a
+real personal recovery the hard part isn't speed, it's deciding which candidates
+are worth checking and not re-checking a keyspace you already swept.
 
-``synaptic`` puts that decision layer in SynapCores Community Edition, an
-AI-native database that unifies SQL, vector search, a property graph, in-database
-AutoML, and an embedded LLM behind one REST gateway:
+synaptic puts that decision layer in SynapCores Community Edition, an AI-native
+database with SQL, vector search, a property graph, in-database AutoML, and an
+embedded LLM behind one REST gateway:
 
-* graph    - a knowledge graph of the wallet owner's own memory hints; GraphRAG
-             assembles ordered candidate tokens from it.
-* llm      - free-text memory ("my dog's name and the year") -> structured hints
-             (optional; degrades to deterministic parsing if the model is cold).
-* automl   - an in-database "password-like" classifier ranks candidates so the
-             search tries the plausible ones first.
-* vector   - candidate embeddings deduplicate against what was already tried.
-* sql      - a run ledger records which wallet and how much keyspace was swept
-             (never the recovered password itself).
+- graph   a knowledge graph of the owner's memory hints; GraphRAG assembles
+          ordered candidate tokens from it.
+- llm     free-text memory ("my dog's name and the year") into structured hints
+          (optional; falls back to plain parsing if the model is cold).
+- automl  an in-database "password-like" classifier ranks candidates so the
+          search tries the plausible ones first.
+- vector  candidate embeddings dedup against what was already tried.
+- sql     a run ledger records which wallet and how much keyspace was swept,
+          never the recovered password.
 
-Everything runs against a *local* SynapCores instance. The tooling only ever
-operates on wallets the operator owns; it is self-recovery infrastructure, the
-same category as the underlying btcrecover fork.
+It runs against a local SynapCores instance and only ever touches wallets the
+operator owns. This is self-recovery tooling, the same category as the btcrecover
+fork it builds on.
 """
 
 __version__ = "0.1.0"

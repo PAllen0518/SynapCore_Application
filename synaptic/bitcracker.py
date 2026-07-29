@@ -1,17 +1,19 @@
-"""Adapter onto the BitCracker V2 MultiBit checker.
+"""Wraps the vendored MultiBit checker.
 
-The checker (``multibit_check.py``) and btcrecover's public test wallet are
-vendored under ``synaptic/vendor/`` so this package is self-contained and runs
-without a BitCracker checkout. Two responsibilities, kept in one place:
+multibit_check.py and the public test wallet live under vendor/, so synaptic
+runs without a BitCracker checkout. Does two things:
 
-* import the vendored ``multibit_check`` so candidate *enumeration* reuses the
-  checker's own tokenlist parser - the candidates synaptic ranks and
-  deduplicates are exactly the ones the checker will try, with no risk of drift.
-* run a recovery by shelling out to the vendored ``multibit_check.py`` and
-  reporting only whether the password was found (never the password itself).
+- enumerate candidates through the checker's own tokenlist parser, so what we
+  rank and dedup is exactly what the checker will try (no drift).
+- run a recovery by shelling out to the checker and reporting only whether the
+  password was found, never the password.
 
-The vendored checker is a point-in-time copy of the file maintained in the
-BitCracker V2 project (© 2026 Paul Allen; GPLv2); see ``vendor/__init__.py``.
+The checker verifies on the CPU (pycryptodome: MD5/AES/base58). synaptic decides
+what to check; the fast CUDA tool in BitCracker V2 is separate and not used here,
+though generate.py emits tokenlists you can feed to it.
+
+The vendored checker is a point-in-time copy from the BitCracker V2 project
+((c) 2026 Paul Allen, GPLv2); see vendor/__init__.py.
 """
 
 from __future__ import annotations
@@ -35,7 +37,7 @@ def _import_checker():
 def enumerate_candidates(tokenlist_path: str, delimiter: str | None = None) -> list[str]:
     """Return every base password a tokenlist expands to, via the checker's parser.
 
-    This is the same enumeration ``multibit_check`` performs internally, so the
+    This is the same enumeration multibit_check performs internally, so the
     candidate set synaptic reasons about matches the search exactly.
     """
     mc = _import_checker()
@@ -49,7 +51,7 @@ def wallet_salt_hex(wallet_path: str) -> str:
 
 
 def load_wallet(wallet_path: str):
-    """Return a ``multibit_check.MultiBitWallet`` for in-process candidate checks."""
+    """Return a multibit_check.MultiBitWallet for in-process candidate checks."""
     mc = _import_checker()
     return mc.MultiBitWallet.load(wallet_path)
 
@@ -80,11 +82,11 @@ class RunResult:
 def run_checker(
     wallet_path: str, tokenlist_path: str, delimiter: str | None = None, cwd: str | None = None
 ) -> RunResult:
-    """Run ``multibit_check.py`` over a tokenlist and report the outcome.
+    """Run multibit_check.py over a tokenlist and report the outcome.
 
     Returns whether a password was found and how many candidates were checked.
     The recovered password is deliberately not captured here - the checker writes
-    it to a restricted ``RECOVERED_PASSWORD.txt`` and synaptic never reads it.
+    it to a restricted RECOVERED_PASSWORD.txt and synaptic never reads it.
     """
     cmd = [sys.executable, CHECKER, "--wallet", wallet_path, "--tokenlist", tokenlist_path]
     if delimiter is not None:

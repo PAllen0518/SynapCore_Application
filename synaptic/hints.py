@@ -1,16 +1,15 @@
-"""Personal recovery hints and the knowledge graph built from them.
+"""Recovery hints and the graph built from them.
 
-A *hint set* is the operator's structured memory of a wallet they own: fragments
-they think were in the password, how strongly they believe each one, and how the
-fragments were joined (delimiters). It is loaded from a local JSON file (YAML is
-also accepted when PyYAML is installed) that ``.gitignore`` keeps out of version
-control - a hint set is candidate password material and is treated as sensitive.
+A hint set is your structured memory of a wallet you own: fragments you think
+were in the password, how strongly you believe each one, and how they were joined
+(delimiters). It loads from a local JSON file (YAML too, if PyYAML is installed)
+that .gitignore keeps out of version control, since a hint set is candidate
+password material.
 
-``build_graph`` writes the hint set into the SynapCores property graph, which
-then becomes the single source of truth that :mod:`synaptic.generate` reads back
-via GraphRAG. Free-text memories can be enriched into discrete hints using the
-embedded LLM's entity extraction, falling back to a deterministic tokenizer when
-the model is cold or unavailable.
+build_graph writes the hint set into the property graph, which then becomes the
+source of truth that generate.py reads back. Free-text memories can be turned
+into discrete hints with the embedded LLM's entity extraction, falling back to a
+plain tokenizer when the model is cold or unavailable.
 """
 
 from __future__ import annotations
@@ -77,7 +76,7 @@ class HintSet:
 
 
 def load_hints(path: str) -> HintSet:
-    """Load a hint set from a ``.json`` file (or ``.yml`` if PyYAML is present)."""
+    """Load a hint set from a .json file (or .yml if PyYAML is present)."""
     with open(path, encoding="utf-8") as fh:
         text = fh.read()
     if path.endswith((".yml", ".yaml")):
@@ -97,7 +96,7 @@ def _cypher_str(value: str) -> str:
     """Escape a string for a Cypher single-quoted literal (value only, no quotes).
 
     Centralizes graph-label escaping so both the write and read paths use one
-    tested routine instead of ad hoc ``replace`` calls.
+    tested routine instead of ad hoc replace calls.
     """
     return value.replace("\\", "\\\\").replace("'", "''")
 
@@ -193,12 +192,9 @@ def enrich_freeform(client: SynapCoresClient | None, text: str, weight: int = 1)
 def build_graph(client: SynapCoresClient, hint_set: HintSet) -> str:
     """Write a hint set into the implicit property graph.
 
-    Shape::
-
-        (:Wallet {label})-[:REMEMBERS {weight}]->(:Hint {text, kind, weight})
-
-    Returns the wallet node id. Existing hint nodes for the same wallet label are
-    cleared first so the graph reflects the current hint set.
+    Shape: (:Wallet {label})-[:REMEMBERS {weight}]->(:Hint {text, kind, weight}).
+    Returns the wallet node id. Existing hint nodes for this wallet label are
+    cleared first, so re-ingesting reflects the current hint set.
     """
     label = _cypher_str(hint_set.wallet_label)
     # Clear any prior graph for this wallet so re-ingesting is idempotent.

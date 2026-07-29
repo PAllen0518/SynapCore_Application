@@ -1,4 +1,4 @@
-"""Ranking logic — heuristic ordering (pure) and AutoML score-mapping (fake client)."""
+"""Ranking logic - heuristic ordering (pure) and AutoML score-mapping (fake client)."""
 
 from synaptic.rank import AutoMLRanker, HeuristicRanker
 

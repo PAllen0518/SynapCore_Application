@@ -1,4 +1,4 @@
-"""Path setup so the tests import ``synaptic`` from the repo root without an install.
+"""Path setup so the tests import synaptic from the repo root without an install.
 
 These unit tests never touch a live SynapCores instance; the live end-to-end path
 is exercised by the demo and by the opt-in integration test.

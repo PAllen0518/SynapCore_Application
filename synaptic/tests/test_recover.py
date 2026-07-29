@@ -1,4 +1,4 @@
-"""Orchestrator (recover.recover) driven with a fake client — no live database.
+"""Orchestrator (recover.recover) driven with a fake client - no live database.
 
 Uses btcrecover's real public test wallet so the in-process check genuinely finds
 the password, while every SynapCores call is served by an in-memory fake. This

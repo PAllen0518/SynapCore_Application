@@ -1,18 +1,17 @@
 """Rank candidates so the search tries the plausible ones first.
 
-Two backends with the same interface (``rank(candidates) -> [(candidate, score)]``,
-best first):
+Two backends share one interface, rank(candidates) -> [(candidate, score)] best
+first:
 
-* :class:`HeuristicRanker` (default) - a structural prior over the candidate's
-  shape, optionally blended with embedding similarity to "style seeds" (example
-  passwords the owner has used elsewhere). Needs no training and no GPU.
-* :class:`AutoMLRanker` - trains an in-database SynapCores classifier to tell
-  realistic passwords from random strings, then scores each candidate by the
-  model's predicted probability. This is the surface the role calls out, and it
-  turns ranking into a learned model rather than a hand-tuned formula.
+- HeuristicRanker (default): a structural prior over the candidate's shape,
+  optionally blended with embedding similarity to "style seeds" (example
+  passwords the owner used elsewhere). No training, no GPU.
+- AutoMLRanker: trains an in-database SynapCores classifier to tell realistic
+  passwords from random strings, then scores each candidate by the model's
+  predicted probability.
 
-Ranking only reorders work; it never changes the candidate *set*, so a good
-password is never dropped by a bad score - it is just checked later.
+Ranking only reorders work. It never drops a candidate, so a good password with a
+low score is still checked, just later.
 """
 
 from __future__ import annotations

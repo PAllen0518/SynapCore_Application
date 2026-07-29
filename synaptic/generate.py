@@ -1,16 +1,14 @@
-"""GraphRAG candidate generation: hint graph -> btcrecover tokenlist.
+"""Turn the hint graph into a btcrecover tokenlist.
 
-Reads the hints for a wallet back out of the SynapCores property graph and turns
-them into a btcrecover-style tokenlist that :mod:`synaptic.bitcracker` (and the
-CUDA/OpenCL tools) can consume directly.
+Reads a wallet's hints back out of the property graph and writes a tokenlist that
+bitcracker.py (and the CUDA/OpenCL tools) can consume directly.
 
-The tokenlist is built in *ordered* form using position anchors (``^N^token``),
-which mirrors how the project's own search lists are written (see ``search38.txt``)
-and lets a remembered delimiter be folded between fragments. Each fragment slot
-offers its case variants; every non-first slot also offers each candidate
-delimiter. Optional hints (weight below the required threshold) additionally get
-an empty "skip" alternative so a fragment can be absent without disturbing the
-positions of the fragments after it.
+By default the tokenlist is ordered, using position anchors (^N^token) like the
+project's own search lists, which lets a remembered delimiter sit between
+fragments. Each slot offers its case variants, and every slot after the first
+also offers each delimiter. An optional hint (weight below the required
+threshold) gets an empty "skip" alternative too, so a fragment can be absent
+without shifting the fragments after it.
 """
 
 from __future__ import annotations
@@ -89,10 +87,10 @@ def generate_tokenlist(
 ) -> str:
     """Build a btcrecover tokenlist string from a list of hints.
 
-    ``ordered=True`` (default) emits position-anchored lines (``^N^token``) that
+    ordered=True (default) emits position-anchored lines (^N^token) that
     reconstruct a known fragment order with delimiters folded between slots.
-    ``ordered=False`` emits unanchored lines and lets the checker permute the
-    fragments — broader coverage for hint sets whose order is unknown, at the
+    ordered=False emits unanchored lines and lets the checker permute the
+    fragments - broader coverage for hint sets whose order is unknown, at the
     cost of a larger candidate set.
     """
     delimiters = list(delimiters) if delimiters else [""]
@@ -120,7 +118,7 @@ def write_tokenlist(
     *,
     ordered: bool = True,
 ) -> str:
-    """Write a generated tokenlist to ``path`` and return the text."""
+    """Write a generated tokenlist to path and return the text."""
     text = generate_tokenlist(hints, delimiters, header, ordered=ordered)
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(text)

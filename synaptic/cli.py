@@ -1,15 +1,15 @@
-"""Command-line interface: ``python -m synaptic <command>``.
+"""Command-line interface: python -m synaptic <command>.
 
-Subcommands
-    status                              health + recorded-keyspace counts
-    ingest   HINTS                      write a hint set into the graph
-    generate HINTS [--out FILE]         emit a btcrecover tokenlist
-    recover  HINTS --wallet KEY [...]   run one recovery step
-    runs     [--wallet-label L]         list recent runs
+    status    health + recorded-keyspace counts
+    ingest    write a hint set into the graph
+    generate  emit a btcrecover tokenlist
+    recover   run one recovery step
+    runs      list recent runs
+    forget    delete stored coverage + runs for a wallet
 
-Connection comes from the environment (see :mod:`synaptic.config`). The recovered
-password is never printed - on success the checker's restricted
-``RECOVERED_PASSWORD.txt`` is written and its path is reported.
+Connection settings come from the environment (see config.py). The recovered
+password is never printed; on a hit the checker's restricted
+RECOVERED_PASSWORD.txt is written and its path reported.
 """
 
 from __future__ import annotations

@@ -1,21 +1,21 @@
 """Reproducible end-to-end demo against btcrecover's public test wallet.
 
-Run it (with a SynapCores instance up and creds in the environment)::
+Run it with a SynapCores instance up and creds in the environment:
 
     python -m synaptic.demo
 
-The wallet is ``multibit-wallet.key`` - btcrecover's public test fixture, whose
-password ``btcr-test-password`` is documented and which holds no funds - so this
-is a safe, deterministic showcase of every SynapCores surface:
+The wallet is multibit-wallet.key, btcrecover's public test fixture. Its password
+btcr-test-password is documented and it holds no funds, so this is a safe,
+deterministic run over every SynapCores surface:
 
-  graph  -> hints go into the property graph and are read back (GraphRAG)
-  automl -> an in-database classifier ranks the candidates
-  sql    -> a run ledger tracks coverage so work is never repeated
-  vector -> candidate embeddings back semantic-duplicate reporting
+  graph   hints go into the property graph and are read back
+  automl  an in-database classifier ranks the candidates
+  sql     a run ledger tracks coverage so work isn't repeated
+  vector  candidate embeddings back near-duplicate reporting
 
-Narrative: round 1 spends a small budget with the heuristic ranker and records
-what it tried; round 2 switches to the AutoML ranker, skips everything round 1
-already covered, and finds the password among the rest.
+Round 1 spends a small budget with the heuristic ranker and records what it
+tried. Round 2 switches to AutoML, skips what round 1 covered, and finds the
+password among the rest.
 """
 
 from __future__ import annotations

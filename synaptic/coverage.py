@@ -1,11 +1,10 @@
-"""Coverage tracking: never sweep the same keyspace twice.
+"""Coverage tracking, so we never sweep the same keyspace twice.
 
-Every candidate a wallet has ever been searched with is recorded by a salted
-SHA-256 in ``sc_candidates`` (plaintext is never stored) and, for semantic
-"near-duplicate" reporting, by its embedding in the ``sc_candidate_vectors``
-collection. Before a run, :func:`partition` splits a freshly generated candidate
-list into the ones already tried and the genuinely new ones, so the search skips
-work it has already done - across sessions, not just within one run.
+Each candidate a wallet has been searched with is stored as a salted SHA-256 in
+sc_candidates (the plaintext is never stored), and optionally as an embedding in
+sc_candidate_vectors for near-duplicate reporting. partition() splits a fresh
+candidate list into already-tried and new, across sessions, not just within one
+run.
 """
 
 from __future__ import annotations
@@ -93,8 +92,8 @@ def record(
     """Persist candidates (as hashes + numeric features + score) for a run.
 
     Idempotent on the candidate hash: rows already recorded for this wallet are
-    skipped rather than upserted (the engine's ``ON CONFLICT`` update cannot
-    reference the existing row). With ``embed=True`` each new candidate's
+    skipped rather than upserted (the engine's ON CONFLICT update cannot
+    reference the existing row). With embed=True each new candidate's
     embedding is also written to the vector collection for later
     semantic-duplicate reporting. Returns the number of new rows written.
     """

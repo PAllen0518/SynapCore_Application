@@ -1,6 +1,6 @@
 """Opt-in end-to-end test against a live SynapCores instance.
 
-Skipped unless ``SYNAPTIC_LIVE=1`` and credentials are in the environment, so CI
+Skipped unless SYNAPTIC_LIVE=1 and credentials are in the environment, so CI
 (which has no database) stays green. When enabled it drives the full loop and
 asserts the public test wallet's password is recovered.
 """

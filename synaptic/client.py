@@ -1,22 +1,20 @@
-"""A thin, dependency-free client for the SynapCores CE REST gateway.
+"""Minimal client for the SynapCores CE REST gateway.
 
-Only the standard library is used (``urllib``), so this package adds nothing to
-the project's install footprint and its unit tests run anywhere.
+Standard library only, so synaptic adds nothing to the install and the tests run
+anywhere.
 
-The gateway wraps successful responses in ``{"data": ..., "meta": {...}}``; every
-method here returns the already-unwrapped ``data``. A handful of endpoint quirks
-discovered against v1.6.5.x CE are handled in one place so the rest of the
-package can stay clean:
+The gateway wraps success responses as {"data": ..., "meta": ...}; every method
+here returns the unwrapped data. A few CE v1.6.5.x quirks are handled in one spot
+so callers don't have to think about them:
 
-* ``/v1/query/execute`` does not accept ``$1`` placeholders, so SQL values are
-  quoted with :func:`sql_literal` instead of bound. All callers in this package
-  build SQL through the helpers here; they never interpolate untrusted input.
-* vector payloads carry the embedding under ``values`` (not ``vector``).
-* the graph endpoints target the tenant's single implicit graph; a ``graph``
-  name must be omitted.
-* ``/v1/graph/match`` takes its query string under the ``sql`` field (the engine
-  accepts Cypher ``MATCH ... RETURN`` there).
-* AutoML feature and target columns must be numeric.
+- /v1/query/execute rejects $1 placeholders, so values are quoted with
+  sql_literal, not bound. Callers only ever quote values they generated
+  themselves, never remote input.
+- vector payloads carry the embedding under "values", not "vector".
+- the graph endpoints use the tenant's single implicit graph, so omit any graph
+  name.
+- /v1/graph/match takes its query under "sql" (the engine accepts Cypher there).
+- AutoML feature and target columns must be numeric.
 """
 
 from __future__ import annotations
@@ -60,8 +58,8 @@ class SynapCoresError(RuntimeError):
 def sql_literal(value: Any) -> str:
     """Render a Python value as a SQL literal for inline interpolation.
 
-    Used because the execute endpoint rejects bound ``$1`` parameters. Strings
-    are single-quoted with embedded quotes doubled; ``None`` becomes ``NULL``;
+    Used because the execute endpoint rejects bound $1 parameters. Strings
+    are single-quoted with embedded quotes doubled; None becomes NULL;
     numbers and bools pass through. This package only ever quotes values it
     generated itself (ids, counts, hex salts, previews), never remote input.
     """
@@ -204,7 +202,7 @@ class SynapCoresClient:
     # -- sql ---------------------------------------------------------------
 
     def sql(self, statement: str) -> dict:
-        """Execute one SQL statement, returning ``{columns, rows, ...}``."""
+        """Execute one SQL statement, returning {columns, rows, ...}."""
         return self._request("POST", "/v1/query/execute", {"sql": statement})
 
     def sql_rows(self, statement: str) -> list[list]:
@@ -218,7 +216,7 @@ class SynapCoresClient:
     # -- embeddings --------------------------------------------------------
 
     def embed(self, text: str) -> list[float]:
-        """Return the embedding vector for ``text`` (all-MiniLM, 384 dims)."""
+        """Return the embedding vector for text (all-MiniLM, 384 dims)."""
         body: dict[str, Any] = {"text": text}
         if self.settings.embed_model:
             body["model"] = self.settings.embed_model
@@ -310,7 +308,7 @@ class SynapCoresClient:
         )
 
     def graph_match(self, cypher: str) -> dict:
-        """Run a Cypher ``MATCH ... RETURN`` against the implicit graph."""
+        """Run a Cypher MATCH ... RETURN against the implicit graph."""
         return self._request("POST", "/v1/graph/match", {"sql": cypher})
 
     # -- automl ------------------------------------------------------------

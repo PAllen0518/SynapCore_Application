@@ -1,27 +1,26 @@
-"""A stdio MCP server exposing the synaptic recovery loop as agent tools.
+"""stdio MCP server that exposes the recovery loop as agent tools.
 
-Run it directly (``python -m synaptic.mcp_server``) and point an MCP client at it
-- for example in ``claude_desktop_config.json``::
+Run it with `python -m synaptic.mcp_server` and point an MCP client at it, e.g.
+in claude_desktop_config.json:
 
     {
       "mcpServers": {
         "synaptic": {
           "command": "python",
           "args": ["-m", "synaptic.mcp_server"],
-          "cwd": "/path/to/BitCracker_V2",
+          "cwd": "/path/to/this/repo",
           "env": {"SYNAPCORES_URL": "http://localhost:8090",
                   "SYNAPCORES_PASSWORD": "..."}
         }
       }
     }
 
-An agent can then drive a recovery campaign conversationally: check status,
-ingest hints, generate a tokenlist, run a recovery step, and recall past runs -
-each mapped to one tool below. The transport is newline-delimited JSON-RPC 2.0 on
-stdin/stdout, per the MCP stdio transport; no third-party dependency is needed.
+An agent can then run a campaign by chat: check status, ingest hints, generate a
+tokenlist, run a recovery step, recall past runs. Transport is newline-delimited
+JSON-RPC 2.0 over stdin/stdout, stdlib only.
 
-The recovered password is never returned through any tool - a successful run
-reports only that it was found and where the restricted file was written.
+No tool ever returns the password. A hit reports only that it was found and where
+the restricted file went.
 """
 
 from __future__ import annotations

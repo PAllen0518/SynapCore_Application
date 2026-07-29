@@ -1,19 +1,15 @@
-"""The recovery orchestrator: one function that runs a full campaign step.
+"""The recovery orchestrator. recover() runs one full campaign step:
 
-``recover`` ties the whole layer together:
-
-1. bootstrap the SynapCores schema and register the wallet (by its salt, an id).
-2. write the hint set into the property graph, then read it back (GraphRAG).
-3. generate a btcrecover tokenlist and enumerate its candidates with the
-   checker's own parser.
-4. drop candidates already tried for this wallet (coverage).
-5. rank the remaining candidates (heuristic or in-database AutoML).
+1. bootstrap the schema and register the wallet (its salt doubles as the id).
+2. write the hints into the property graph, then read them back (GraphRAG).
+3. generate a tokenlist and enumerate its candidates with the checker's parser.
+4. drop candidates already tried for this wallet.
+5. rank the rest (heuristic or in-database AutoML).
 6. check them in ranked order, in-process, stopping at the first hit.
 7. record the run and the tried candidates (never the password) in SQL.
 
-The result is a small report describing what SynapCores contributed: how many
-candidates were pruned as already-covered, how they were ordered, and - if found
-- how far down the ranked list the password sat.
+It returns a small report: how many candidates were skipped as already-covered,
+which ranker ran, and where the password sat in the ranking if found.
 """
 
 from __future__ import annotations
@@ -60,7 +56,7 @@ def _now() -> str:
 
 
 def wallet_id_by_label(client: SynapCoresClient, label: str) -> str | None:
-    """Resolve a wallet label to its id, quoting the label via ``sql_literal``.
+    """Resolve a wallet label to its id, quoting the label via sql_literal.
 
     Centralized so every label lookup uses the same safe quoting instead of ad
     hoc f-string interpolation.
@@ -104,7 +100,7 @@ def recover(
     skip_covered: bool = True,
     max_checks: int | None = None,
 ) -> RunReport:
-    """Run one recovery step and return a :class:`RunReport`."""
+    """Run one recovery step and return a RunReport."""
     started = time.monotonic()
     run_id = uuid.uuid4().hex
     schema.bootstrap(client)
