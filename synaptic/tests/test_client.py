@@ -35,6 +35,19 @@ def test_token_without_credentials_raises():
         client.token()
 
 
+def test_nonlocal_url_rejected_by_default():
+    with pytest.raises(SynapCoresError, match="non-local"):
+        SynapCoresClient(Settings(url="http://remote.example:8090", token="tok"))
+
+
+def test_nonlocal_url_allowed_with_flag():
+    # SYNAPTIC_ALLOW_REMOTE opts in explicitly; construction then succeeds.
+    client = SynapCoresClient(
+        Settings(url="http://remote.example:8090", token="tok", allow_remote=True)
+    )
+    assert client.settings.url.endswith("8090")
+
+
 class _FakeResp:
     def __init__(self, payload):
         self._data = json.dumps(payload).encode()

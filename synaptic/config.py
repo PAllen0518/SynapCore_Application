@@ -9,6 +9,8 @@ nothing sensitive lands in version control:
     SYNAPCORES_PASSWORD    admin password
     SYNAPCORES_EMBED_MODEL pin the embedding model (optional, for reproducibility)
     SYNAPCORES_LLM_MODEL   pin the entity/LLM model (optional)
+    SYNAPTIC_ALLOW_REMOTE  set truthy to allow a non-local URL (off by default,
+                           so candidate material is never sent off-box by accident)
 
 The SynapCores first-boot log prints an admin password and an API key once. Put
 one of them in the environment (or a local .env you do not commit) before using
@@ -21,6 +23,7 @@ import os
 from dataclasses import dataclass
 
 DEFAULT_URL = "http://localhost:8090"
+_TRUTHY = {"1", "true", "yes", "on"}
 
 
 @dataclass
@@ -33,6 +36,7 @@ class Settings:
     password: str | None = None
     embed_model: str | None = None
     llm_model: str | None = None
+    allow_remote: bool = False
 
     @classmethod
     def from_env(cls, environ: dict | None = None) -> Settings:
@@ -44,6 +48,7 @@ class Settings:
             password=env.get("SYNAPCORES_PASSWORD") or None,
             embed_model=env.get("SYNAPCORES_EMBED_MODEL") or None,
             llm_model=env.get("SYNAPCORES_LLM_MODEL") or None,
+            allow_remote=env.get("SYNAPTIC_ALLOW_REMOTE", "").lower() in _TRUTHY,
         )
 
     def has_credentials(self) -> bool:

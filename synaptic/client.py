@@ -28,10 +28,17 @@ import urllib.error
 import urllib.request
 from collections.abc import Sequence
 from typing import Any
+from urllib.parse import urlparse
 
 from .config import Settings
 
 _log = logging.getLogger("synaptic.client")
+_LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}
+
+
+def _is_local(url: str) -> bool:
+    host = (urlparse(url).hostname or "").lower()
+    return host in _LOCAL_HOSTS
 
 
 class SynapCoresError(RuntimeError):
@@ -80,6 +87,11 @@ class SynapCoresClient:
         backoff: float = 0.5,
     ):
         self.settings = settings or Settings.from_env()
+        if not _is_local(self.settings.url) and not self.settings.allow_remote:
+            raise SynapCoresError(
+                f"SYNAPCORES_URL is non-local ({self.settings.url}); synaptic sends "
+                "candidate-derived data there. Set SYNAPTIC_ALLOW_REMOTE=1 to permit it."
+            )
         self.timeout = timeout
         self.retries = retries
         self.backoff = backoff
