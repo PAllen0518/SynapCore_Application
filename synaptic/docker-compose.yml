@@ -1,0 +1,30 @@
+# Codifies the SynapCores CE dependency synaptic talks to.
+#
+#   docker compose -f synaptic/docker-compose.yml up -d     # start
+#   docker compose -f synaptic/docker-compose.yml logs | grep -A12 FIRST-BOOT
+#   docker compose -f synaptic/docker-compose.yml down       # stop + remove
+#
+# Works with `podman compose` too. Host port 8090 -> container 8080 (8080 is
+# often taken locally, e.g. by Pi-hole). Set SYNAPCORES_PASSWORD in your shell
+# from the first-boot log before running synaptic.
+services:
+  synapcores:
+    image: ghcr.io/synapcores/community:latest
+    container_name: synapcores
+    ports:
+      - "8090:8080"
+    environment:
+      AIDB_ACCEPT_LICENSE: "1"
+      # Provide a stable secret via the environment; do not commit a real value.
+      AIDB_JWT_SECRET: "${AIDB_JWT_SECRET:-change-me-in-your-env}"
+    volumes:
+      - synapcores-data:/var/lib/synapcores
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  synapcores-data:
