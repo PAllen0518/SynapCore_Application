@@ -9,7 +9,7 @@ pycryptodome==3.23.0
 
 # dev / CI
 pytest==9.1.1
-pytest-cov==6.0.0
+pytest-cov==7.1.0
 ruff==0.16.0
 
 # optional: YAML hint files
