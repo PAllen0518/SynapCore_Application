@@ -13,6 +13,7 @@ build/
 
 # Local env / secrets (never commit)
 .env
+AGENTS.md
 
 # Sensitive - personal hint sets (candidate password material) and generated
 # tokenlists. The sanitized demo hint set is kept.

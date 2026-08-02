@@ -6,7 +6,11 @@ All notable changes to `synaptic` are documented here. Format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-29
+
 ### Added
+- SynapCores-backed graph/vector/SQL/AutoML/LLM/MCP intelligence layer over
+  BitCracker V2, with a reproducible demo against btcrecover's public test wallet.
 - Packaging via `pyproject.toml` (pinned deps, console script, ruff + pytest +
   coverage config); `docker-compose.yml` and `scripts/synapcores.sh` codify the
   SynapCores dependency; container lifecycle runbook in the README.
@@ -20,19 +24,9 @@ All notable changes to `synaptic` are documented here. Format follows
   (with the CE indexed-projection workaround).
 - Free-permutation tokenlist mode (`generate_tokenlist(..., ordered=False)`).
 - Structured logging with `-v/-vv`; MCP argument validation + bounded pagination.
+- Transactional run recording (a run row is written up front and finalized in a
+  `finally`, so a mid-run failure still leaves an auditable row).
 - Governance scaffolding: CODEOWNERS, PR template, CONTRIBUTING, CodeQL +
   Dependabot + release workflows.
-- Expanded tests: orchestrator, rankers, CLI, retention, guards, MCP validation.
-
-### Changed
-- Run recording is now transactional (a run row is written up front and
-  finalized in a `finally`, so a mid-run failure still leaves an auditable row).
-- `write_found_password` writes the restricted file directly instead of mutating
-  the process CWD (no more `os.chdir`).
-
-## [0.1.0] - 2026-07-29
-
-### Added
-- Initial `synaptic` layer: SynapCores-backed graph/vector/SQL/AutoML/LLM/MCP
-  intelligence over BitCracker V2, with a reproducible demo against btcrecover's
-  public test wallet.
+- Unit tests across the client, coverage, features, generation, hints, ranking,
+  orchestrator, CLI, and MCP protocol; opt-in live integration.

@@ -1,0 +1,8 @@
+# Normalize line endings: store LF in the repo, check out native on each OS.
+* text=auto eol=lf
+
+# Shell scripts must stay LF.
+*.sh text eol=lf
+
+# Binary fixtures git should not touch.
+*.key binary
